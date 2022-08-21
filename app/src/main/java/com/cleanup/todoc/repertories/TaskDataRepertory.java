@@ -22,7 +22,4 @@ public class TaskDataRepertory {
 
     public void updateTasks(Task task){taskDAO.updateTasks(task);}
 
-    public LiveData<Project> getProjetIds(Long projectId){taskDAO.getProjectId(projectId);
-        return null;
-    }
 }

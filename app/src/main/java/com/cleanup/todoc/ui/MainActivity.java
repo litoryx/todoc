@@ -15,18 +15,24 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.cleanup.todoc.InterfaceDAO.ProjectDAO;
 import com.cleanup.todoc.InterfaceDAO.SaveMyProjectDatabase;
 import com.cleanup.todoc.InterfaceDAO.TaskDAO;
+import com.cleanup.todoc.ProjectViewModel;
 import com.cleanup.todoc.R;
+import com.cleanup.todoc.injections.ViewModelFactory;
 import com.cleanup.todoc.model.Project;
 import com.cleanup.todoc.model.Task;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>Home activity of the application which is displayed when the user opens the app.</p>
@@ -41,16 +47,16 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     private final Project[] allProjects = Project.getAllProjects();
 
     private TaskDAO mTaskDAO;
-    /**
-     * List of all current tasks of the application
-     */
-    @NonNull
-    private final ArrayList<Task> tasks = new ArrayList<>();
+
+    private ProjectDAO mProjectDAO;
+
+    private ProjectViewModel mainViewModel;
+
 
     /**
      * The adapter which handles the list of tasks
      */
-    private final TasksAdapter adapter = new TasksAdapter(tasks, this);
+    private final TasksAdapter adapter = new TasksAdapter(new ArrayList<Task>(), this);
 
     /**
      * The sort method to be used to display tasks
@@ -100,6 +106,9 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
 
         listTasks = findViewById(R.id.list_tasks);
         lblNoTasks = findViewById(R.id.lbl_no_task);
+
+        configureViewModel();
+
         mTaskDAO = SaveMyProjectDatabase.getInstance(this).mTaskDAO();
         mTaskDAO.getTasks();
 
@@ -133,16 +142,24 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
         } else if (id == R.id.filter_recent_first) {
             sortMethod = SortMethod.RECENT_FIRST;
         }
-
-        updateTasks();
-
+        mainViewModel.onSortChanged(sortMethod);
         return super.onOptionsItemSelected(item);
+    }
+
+    private void configureViewModel() {
+
+        this.mainViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance(this)).get(ProjectViewModel.class);
+        mainViewModel.getTask().observe(this, new Observer<List<Task>>() {
+            @Override
+            public void onChanged(List<Task> tasks) {
+                updateTasks(tasks);
+            }
+        });
     }
 
     @Override
     public void onDeleteTask(Task task) {
-        tasks.remove(task);
-        updateTasks();
+        this.mainViewModel.deleteTask(task.getId());
     }
 
     /**
@@ -180,6 +197,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
                 );
 
                 addTask(task);
+
                 //SaveMyProjectDatabase.getInstance(this).mTaskDAO().insertTasks(task);
                 dialogInterface.dismiss();
             }
@@ -215,14 +233,14 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
      * @param task the task to be added to the list
      */
     private void addTask(@NonNull Task task) {
-        tasks.add(task);
-        updateTasks();
+        this.mainViewModel.insertTask(task);
     }
 
     /**
      * Updates the list of tasks in the UI
      */
-    private void updateTasks() {
+    private void updateTasks(List<Task> tasks) {
+        if(tasks == null){return;}
         if (tasks.size() == 0) {
             lblNoTasks.setVisibility(View.VISIBLE);
             listTasks.setVisibility(View.GONE);
@@ -305,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     /**
      * List of all possible sort methods for task
      */
-    private enum SortMethod {
+    public enum SortMethod {
         /**
          * Sort alphabetical by name
          */

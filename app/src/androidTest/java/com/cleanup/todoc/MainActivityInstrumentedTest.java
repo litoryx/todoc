@@ -1,23 +1,35 @@
 package com.cleanup.todoc;
 
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
-import android.support.v7.widget.RecyclerView;
+import android.content.Context;
 import android.view.View;
 import android.widget.TextView;
 
+import com.cleanup.todoc.InterfaceDAO.SaveMyProjectDatabase;
+import com.cleanup.todoc.InterfaceDAO.TaskDAO;
+import com.cleanup.todoc.model.Task;
 import com.cleanup.todoc.ui.MainActivity;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.replaceText;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import java.io.IOException;
+import java.util.List;
+
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.runner.AndroidJUnit4;
+
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.replaceText;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static com.cleanup.todoc.TestUtils.withRecyclerView;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -32,6 +44,29 @@ import static org.junit.Assert.assertThat;
 public class MainActivityInstrumentedTest {
     @Rule
     public ActivityTestRule<MainActivity> rule = new ActivityTestRule<>(MainActivity.class);
+    private TaskDAO taskDAO;
+    private SaveMyProjectDatabase db;
+
+    @Before
+    public void createDb() {
+        Context context = ApplicationProvider.getApplicationContext();
+        db = Room.inMemoryDatabaseBuilder(context, SaveMyProjectDatabase.class).build();
+        taskDAO = db.mTaskDAO();
+    }
+
+    @After
+    public void closeDb() throws IOException {
+        db.close();
+    }
+
+    @Test
+    public void writeTaskAndReadInList() throws Exception {
+
+        Task task = new Task(0,1,"Linge",15/02/21);
+        db.mTaskDAO().insertTasks(task);
+        List<Task> byTask = taskDAO.getTasks().getValue();
+        assertThat(byTask.get(0), equalTo(task));
+    }
 
     @Test
     public void addAndRemoveTask() {
