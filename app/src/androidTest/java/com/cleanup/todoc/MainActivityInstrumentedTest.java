@@ -6,18 +6,20 @@ import android.widget.TextView;
 
 import com.cleanup.todoc.InterfaceDAO.SaveMyProjectDatabase;
 import com.cleanup.todoc.InterfaceDAO.TaskDAO;
+import com.cleanup.todoc.model.Project;
 import com.cleanup.todoc.model.Task;
 import com.cleanup.todoc.ui.MainActivity;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestWatcher;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
 import java.util.List;
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 import androidx.test.core.app.ApplicationProvider;
@@ -32,6 +34,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static com.cleanup.todoc.TestUtils.withRecyclerView;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -47,11 +50,16 @@ public class MainActivityInstrumentedTest {
     private TaskDAO taskDAO;
     private SaveMyProjectDatabase db;
 
+    @Rule
+    public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
+
     @Before
     public void createDb() {
         Context context = ApplicationProvider.getApplicationContext();
         db = Room.inMemoryDatabaseBuilder(context, SaveMyProjectDatabase.class).build();
         taskDAO = db.mTaskDAO();
+        Project project = new Project(1,"dsds",0);
+        db.mProjectDAO().createProject(project);
     }
 
     @After
@@ -64,8 +72,29 @@ public class MainActivityInstrumentedTest {
 
         Task task = new Task(0,1,"Linge",15/02/21);
         db.mTaskDAO().insertTasks(task);
-        List<Task> byTask = taskDAO.getTasks().getValue();
-        assertThat(byTask.get(0), equalTo(task));
+        List<Task> byTask = LiveDataTestUtil.getOrAwaitValue(taskDAO.getTasks());
+        assertThat(byTask, equalTo(task));
+        assertThat(byTask.size(), equalTo(1));
+    }
+
+    @Test
+    public void TestUpdateTask() throws InterruptedException {
+        Task task = new Task(0,1,"Linge",15/02/21);
+        Task taskU = new Task(0,1,"Papy",15/02/21);
+        db.mTaskDAO().insertTasks(task);
+        db.mTaskDAO().updateTasks(taskU);
+        List<Task> byTask = LiveDataTestUtil.getOrAwaitValue(taskDAO.getTasks());
+        assertNotSame(byTask.get(0), equalTo(byTask.get(1)));
+    }
+
+    @Test
+    public void TestRemoveTask() throws InterruptedException {
+        Task task = new Task(0,1,"Linge",15/02/21);
+        long taskId = task.getId();
+        db.mTaskDAO().insertTasks(task);
+        db.mTaskDAO().deleteTasks(taskId);
+        List<Task> byTask = LiveDataTestUtil.getOrAwaitValue(taskDAO.getTasks());
+        assertThat(byTask.size(), equalTo(0));
     }
 
     @Test

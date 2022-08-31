@@ -61,7 +61,7 @@ public abstract class SaveMyProjectDatabase extends RoomDatabase {
                 super.onCreate(db);
 
                 Executors.newSingleThreadExecutor().execute(() -> INSTANCE.mProjectDAO().createProject(
-                        new Project(1, "Badass", 0)));
+                        new Project(3, "Badass", 0)));
 
             }
 
