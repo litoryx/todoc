@@ -25,7 +25,9 @@ import androidx.test.runner.AndroidJUnit4;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 
 @RunWith(AndroidJUnit4.class)
@@ -53,12 +55,30 @@ public class TaskDAOTestI {
 
     @Test
     public void writeTaskAndReadInList() throws Exception {
-
-        Task task = new Task(0,1,"Linge",15/02/21);
+        Task task = new Task(0,1,"Linge",2);
         db.mTaskDAO().insertTasks(task);
-
         List<Task> byTask = LiveDataTestUtil.getOrAwaitValue(taskDAO.getTasks());
+        assertThat(byTask.get(0), equalTo(task));
         assertThat(byTask.size(), equalTo(1));
-        assertEquals(byTask.get(0), task);
+    }
+
+    @Test
+    public void testUpdateTask() throws InterruptedException {
+        Task task = new Task(0,1,"Linge",1);
+        Task taskU = new Task(0,1,"Papy",0);
+        db.mTaskDAO().insertTasks(task);
+        db.mTaskDAO().updateTasks(taskU);
+        List<Task> byTask = LiveDataTestUtil.getOrAwaitValue(taskDAO.getTasks());
+        assertThat(taskU, equalTo(byTask.get(0)));
+    }
+
+    @Test
+    public void testRemoveTask() throws InterruptedException {
+        Task task = new Task(0,1,"Linge",3);
+        long taskId = task.getId();
+        db.mTaskDAO().insertTasks(task);
+        db.mTaskDAO().deleteTasks(taskId);
+        List<Task> byTask = LiveDataTestUtil.getOrAwaitValue(taskDAO.getTasks());
+        assertTrue(byTask.isEmpty());
     }
 }
