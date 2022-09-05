@@ -44,8 +44,8 @@ public class TaskDAOTestI {
         Context context = ApplicationProvider.getApplicationContext();
         db = Room.inMemoryDatabaseBuilder(context, SaveMyProjectDatabase.class).build();
         taskDAO = db.mTaskDAO();
-        Project project = new Project(1,"dsds",0);
-        db.mProjectDAO().createProject(project);
+        Task task = new Task(1,0,"sdvff",0);
+        db.mTaskDAO().insertTasks(task);
     }
 
     @After

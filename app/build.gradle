@@ -8,6 +8,7 @@ android {
         targetSdkVersion 31
         versionCode 1
         versionName "1.0"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         compileOptions {
 
@@ -27,6 +28,9 @@ android {
         }
 
     }
+    testOptions {
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
+    }
     lintOptions {
         disable 'RestrictedApi'
     }
@@ -38,7 +42,7 @@ dependencies {
     implementation 'androidx.room:room-common:2.4.3'
     implementation 'androidx.test:core:1.4.0'
     androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
-
+    androidTestUtil 'androidx.test:orchestrator:1.4.1'
     // Test helpers for Room
     androidTestImplementation "androidx.room:room-testing:2.4.3"
     testImplementation "android.arch.persistence.room:testing:1.1.0"

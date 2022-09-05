@@ -7,7 +7,6 @@ import com.cleanup.todoc.model.Task;
 
 import java.util.concurrent.Executors;
 
-
 import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
@@ -60,8 +59,12 @@ public abstract class SaveMyProjectDatabase extends RoomDatabase {
 
                 super.onCreate(db);
 
-                Executors.newSingleThreadExecutor().execute(() -> INSTANCE.mProjectDAO().createProject(
-                        new Project(3, "Badass", 0)));
+                Executors.newSingleThreadExecutor().execute(() -> {
+                    for (Project project : Project.getAllProjects()) {
+                        INSTANCE.mProjectDAO().createProject(project);
+                    }
+                });
+
 
             }
 

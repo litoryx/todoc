@@ -26,7 +26,7 @@ public class ProjectViewModel extends ViewModel {
     private Executor executor;
 
     private final MediatorLiveData<List<Task>> mainViewStateMediatorLiveData = new MediatorLiveData<>();
-    private final MutableLiveData<MainActivity.SortMethod> sortLiveData = new MutableLiveData<>(MainActivity.SortMethod.NONE);
+    private final MutableLiveData<MainActivity.SortMethod> sortLiveData = new MutableLiveData<>(MainActivity.SortMethod.OLD_FIRST);
 
     @Nullable
 
@@ -82,8 +82,6 @@ public class ProjectViewModel extends ViewModel {
     }
 
 
-
-
     /**/
     public void onSortChanged(MainActivity.SortMethod sortMethod) {
 
@@ -91,7 +89,11 @@ public class ProjectViewModel extends ViewModel {
 
     }
 
-    private void combine(MainActivity.SortMethod sortMethod, List<Task> tasks){
+    private void combine(MainActivity.SortMethod sortMethod, List<Task> tasks) {
+
+        if (tasks == null) {
+            return;
+        }
 
         switch (sortMethod) {
             case ALPHABETICAL:
@@ -113,4 +115,4 @@ public class ProjectViewModel extends ViewModel {
     }
 
 
-    }
+}
