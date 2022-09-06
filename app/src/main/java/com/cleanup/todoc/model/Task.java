@@ -24,7 +24,7 @@ public class Task {
     /**
      * The unique identifier of the task
      */
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     private long id;
 
     /**

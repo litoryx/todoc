@@ -51,7 +51,7 @@ public class ProjectDAOTestI {
         Project project = new Project(0,"Projet",0xFFEADAD1);
         db1.mProjectDAO().createProject(project);
         List<Project> byProject = LiveDataTestUtil.getOrAwaitValue(mprojectDAO.getProjects());
-        assertThat(byProject.get(0), equalTo(project));
+        assertThat(byProject.get(1), equalTo(project));
         assertThat(byProject.size(), equalTo(1));
     }
 }
