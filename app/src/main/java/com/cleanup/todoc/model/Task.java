@@ -15,7 +15,11 @@ import java.util.Objects;
  *
  * @author Gaëtan HERFRAY
  */
-@Entity
+@Entity(foreignKeys = @ForeignKey(entity = Project.class,
+
+        parentColumns = "id",
+
+        childColumns = "projectId"))
 public class Task {
     /**
      * The unique identifier of the task

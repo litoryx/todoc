@@ -10,6 +10,19 @@ android {
         versionName "1.0"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testOptions {
+            execution 'ANDROIDX_TEST_ORCHESTRATOR'
+        }
+        buildTypes {
+            release {
+                minifyEnabled true
+                shrinkResources true
+                proguardFiles getDefaultProguardFile(
+                        'proguard-android-optimize.txt'),
+                        'proguard-rules.pro'
+            }
+
+        }
         compileOptions {
 
             targetCompatibility 1.8
@@ -17,20 +30,10 @@ android {
             sourceCompatibility 1.8
 
         }
-    }
-    buildTypes {
-        release {
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile(
-                    'proguard-android-optimize.txt'),
-                    'proguard-rules.pro'
-        }
 
     }
-    testOptions {
-        execution 'ANDROIDX_TEST_ORCHESTRATOR'
-    }
+
+
     lintOptions {
         disable 'RestrictedApi'
     }
@@ -45,7 +48,7 @@ dependencies {
     androidTestUtil 'androidx.test:orchestrator:1.4.1'
     // Test helpers for Room
     androidTestImplementation "androidx.room:room-testing:2.4.3"
-    testImplementation "android.arch.persistence.room:testing:1.1.0"
+    testImplementation "android.arch.persistence.room:testing:1.1.1"
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:runner:1.4.0'
     androidTestImplementation 'androidx.test:rules:1.4.0'

@@ -37,7 +37,7 @@ public class ProjectDAOTestI {
         Context context = ApplicationProvider.getApplicationContext();
         db1 = Room.inMemoryDatabaseBuilder(context, SaveMyProjectDatabase.class).build();
         mprojectDAO = db1.mProjectDAO();
-        Project project = new Project(5L,"sdvff",0);
+        Project project = new Project(0,"sdvff",0);
         db1.mProjectDAO().createProject(project);
     }
 
@@ -52,6 +52,6 @@ public class ProjectDAOTestI {
         db1.mProjectDAO().createProject(project);
         List<Project> byProject = LiveDataTestUtil.getOrAwaitValue(mprojectDAO.getProjects());
         assertThat(byProject.get(0), equalTo(project));
-        assertThat(byProject.size(), equalTo(2));
+        assertThat(byProject.size(), equalTo(1));
     }
 }
