@@ -1,0 +1,263 @@
+@startuml
+class com.cleanup.todoc.ProjectViewModel {
+- TaskDataRepertory taskDataSource
+- ProjectDateRepertory projectDateSource
+- Executor executor
+- MediatorLiveData<List<Task>> mainViewStateMediatorLiveData
+- MutableLiveData<MainActivity.SortMethod> sortLiveData
+- LiveData<Project> currentProject
++ LiveData<Project> getProject()
++ LiveData<List<Task>> getTask()
++ void insertTask(Task)
++ void updateTask(Task)
++ void deleteTask(long)
++ void onSortChanged(MainActivity.SortMethod)
+- void combine(MainActivity.SortMethod,List<Task>)
+}
+class com.cleanup.todoc.test.BuildConfig {
++ {static} boolean DEBUG
++ {static} String APPLICATION_ID
++ {static} String BUILD_TYPE
+}
+class com.cleanup.todoc.TestUtils {
++ {static} ViewAction actionOnItemViewAtPosition(int,int,ViewAction)
++ {static} RecyclerViewMatcher withRecyclerView(int)
+}
+class com.cleanup.todoc.TestUtils.ActionOnItemViewAtPositionViewAction {
+- int position
+- ViewAction viewAction
+- int viewId
++ Matcher<View> getConstraints()
++ String getDescription()
++ void perform(UiController,View)
+}
+class com.cleanup.todoc.TestUtils.ScrollToPositionViewAction {
+- int position
++ Matcher<View> getConstraints()
++ String getDescription()
++ void perform(UiController,View)
+}
+class com.cleanup.todoc.repertories.ProjectDateRepertory {
+- ProjectDAO projectDAO
++ LiveData<List<Project>> getProjects()
+}
+class com.cleanup.todoc.repertories.TaskDataRepertory {
+- TaskDAO taskDAO
++ LiveData<List<Task>> getTasks()
++ void insertTasks(Task)
++ void deleteTasks(Long)
++ void updateTasks(Task)
+}
+class com.cleanup.todoc.MainActivityInstrumentedTest {
++ ActivityTestRule<MainActivity> rule
+- TaskDAO taskDAO
+- SaveMyProjectDatabase db
++ InstantTaskExecutorRule instantTaskExecutorRule
++ void createDb()
++ void closeDb()
++ void writeTaskAndReadInList()
++ void addAndRemoveTask()
++ void sortTasks()
+}
+class com.cleanup.todoc.injections.ViewModelFactory {
+- TaskDataRepertory taskDataSource
+- ProjectDateRepertory projectDateSource
+- Executor executor
+- {static} ViewModelFactory factory
++ {static} ViewModelFactory getInstance(Context)
++ T create(Class<T>)
+}
+class com.cleanup.todoc.model.Project {
+- long id
+- String name
+- int color
++ {static} Project[] getAllProjects()
++ {static} Project getProjectById(long)
++ long getId()
++ String getName()
++ int getColor()
++ String toString()
+}
+class com.cleanup.todoc.ui.TasksAdapter {
+- List<Task> tasks
+- DeleteTaskListener deleteTaskListener
+~ void updateTasks(List<Task>)
++ TaskViewHolder onCreateViewHolder(ViewGroup,int)
++ void onBindViewHolder(TaskViewHolder,int)
++ int getItemCount()
+}
+interface com.cleanup.todoc.ui.TasksAdapter.DeleteTaskListener {
+~ void onDeleteTask(Task)
+}
+class com.cleanup.todoc.ui.TasksAdapter.TaskViewHolder {
+- AppCompatImageView imgProject
+- TextView lblTaskName
+- TextView lblProjectName
+- AppCompatImageView imgDelete
+- DeleteTaskListener deleteTaskListener
+~ void bind(Task)
+}
+class com.cleanup.todoc.InterfaceDAO.TaskDAO_Impl {
+- RoomDatabase __db
+- EntityInsertionAdapter<Task> __insertionAdapterOfTask
+- EntityDeletionOrUpdateAdapter<Task> __updateAdapterOfTask
+- SharedSQLiteStatement __preparedStmtOfDeleteTasks
++ long insertTasks(Task)
++ int updateTasks(Task)
++ int deleteTasks(long)
++ LiveData<List<Task>> getTasks()
++ int getProjectId(long)
++ {static} List<Class<?>> getRequiredConverters()
+}
+class com.cleanup.todoc.TaskUnitTest {
++ void test_projects()
++ void test_az_comparator()
++ void test_za_comparator()
++ void test_recent_comparator()
++ void test_old_comparator()
+}
+class com.cleanup.todoc.InterfaceDAO.SaveMyProjectDatabase_Impl {
+- TaskDAO _taskDAO
+- ProjectDAO _projectDAO
+# SupportSQLiteOpenHelper createOpenHelper(DatabaseConfiguration)
+# InvalidationTracker createInvalidationTracker()
++ void clearAllTables()
+# Map<Class<?>,List<Class<?>>> getRequiredTypeConverters()
++ TaskDAO mTaskDAO()
++ ProjectDAO mProjectDAO()
+}
+class com.cleanup.todoc.model.Task {
+- long id
+- long projectId
+- String name
+- long creationTimestamp
++ long getId()
+- void setId(long)
+- void setProjectId(long)
++ Project getProject()
++ String getName()
+- void setName(String)
+- void setCreationTimestamp(long)
++ long getProjectId()
++ long getCreationTimestamp()
++ boolean equals(Object)
++ int hashCode()
+}
+class com.cleanup.todoc.model.Task.TaskAZComparator {
++ int compare(Task,Task)
+}
+class com.cleanup.todoc.model.Task.TaskZAComparator {
++ int compare(Task,Task)
+}
+class com.cleanup.todoc.model.Task.TaskRecentComparator {
++ int compare(Task,Task)
+}
+class com.cleanup.todoc.model.Task.TaskOldComparator {
++ int compare(Task,Task)
+}
+class com.cleanup.todoc.BuildConfig {
++ {static} boolean DEBUG
++ {static} String APPLICATION_ID
++ {static} String BUILD_TYPE
++ {static} int VERSION_CODE
++ {static} String VERSION_NAME
+}
+interface com.cleanup.todoc.InterfaceDAO.TaskDAO {
+~ LiveData<List<Task>> getTasks()
+~ int getProjectId(long)
+~ int deleteTasks(long)
+~ long insertTasks(Task)
+~ int updateTasks(Task)
+}
+class com.cleanup.todoc.ui.MainActivity {
+- Project[] allProjects
+- TaskDAO mTaskDAO
+- ProjectDAO mProjectDAO
+- ProjectViewModel mainViewModel
+- TasksAdapter adapter
+- SortMethod sortMethod
++ AlertDialog dialog
+- EditText dialogEditText
+- Spinner dialogSpinner
+- RecyclerView listTasks
+- TextView lblNoTasks
++ void onCreate(Bundle)
++ boolean onCreateOptionsMenu(Menu)
++ boolean onOptionsItemSelected(MenuItem)
+- void configureViewModel()
++ void onDeleteTask(Task)
+- void onPositiveButtonClick(DialogInterface)
+- void showAddTaskDialog()
+- void addTask(Task)
+- void updateTasks(List<Task>)
+- AlertDialog getAddTaskDialog()
+- void populateDialogSpinner()
+}
+enum com.cleanup.todoc.ui.SortMethod {
++  ALPHABETICAL
++  ALPHABETICAL_INVERTED
++  RECENT_FIRST
++  OLD_FIRST
++  NONE
+}
+interface com.cleanup.todoc.InterfaceDAO.ProjectDAO {
+~ LiveData<List<Project>> getProjects()
+~ long createProject(Project)
+}
+class com.cleanup.todoc.InterfaceDAO.ProjectDAO_Impl {
+- RoomDatabase __db
+- EntityInsertionAdapter<Project> __insertionAdapterOfProject
++ long createProject(Project)
++ LiveData<List<Project>> getProjects()
++ {static} List<Class<?>> getRequiredConverters()
+}
+abstract class com.cleanup.todoc.InterfaceDAO.SaveMyProjectDatabase {
+- {static} SaveMyProjectDatabase INSTANCE
++ {abstract}TaskDAO mTaskDAO()
++ {abstract}ProjectDAO mProjectDAO()
++ {static} SaveMyProjectDatabase getInstance(Context)
+- {static} RoomDatabase.Callback prepopulateDatabase()
+}
+class com.cleanup.todoc.RecyclerViewMatcher {
+- int recyclerViewId
++ Matcher<View> atPosition(int)
++ Matcher<View> atPositionOnView(int,int)
+}
+class com.cleanup.todoc.TaskDAOTestI {
+- TaskDAO taskDAO
+- SaveMyProjectDatabase db
++ InstantTaskExecutorRule instantTaskExecutorRule
++ void createDb()
++ void closeDb()
++ void writeTaskAndReadInList()
+}
+class com.cleanup.todoc.LiveDataTestUtil {
++ {static} T getOrAwaitValue(LiveData<T>)
+}
+
+
+androidx.lifecycle.ViewModel <|-- com.cleanup.todoc.ProjectViewModel
+com.cleanup.todoc.TestUtils +.. com.cleanup.todoc.TestUtils.ActionOnItemViewAtPositionViewAction
+com.cleanup.todoc.ViewAction <|.. com.cleanup.todoc.TestUtils.ActionOnItemViewAtPositionViewAction
+com.cleanup.todoc.TestUtils +.. com.cleanup.todoc.TestUtils.ScrollToPositionViewAction
+com.cleanup.todoc.ViewAction <|.. com.cleanup.todoc.TestUtils.ScrollToPositionViewAction
+com.cleanup.todoc.injections.Factory <|.. com.cleanup.todoc.injections.ViewModelFactory
+com.cleanup.todoc.ui.Adapter <|-- com.cleanup.todoc.ui.TasksAdapter
+com.cleanup.todoc.ui.TasksAdapter +.. com.cleanup.todoc.ui.TasksAdapter.DeleteTaskListener
+com.cleanup.todoc.ui.TasksAdapter +.. com.cleanup.todoc.ui.TasksAdapter.TaskViewHolder
+com.cleanup.todoc.ui.ViewHolder <|-- com.cleanup.todoc.ui.TasksAdapter.TaskViewHolder
+com.cleanup.todoc.InterfaceDAO.TaskDAO <|.. com.cleanup.todoc.InterfaceDAO.TaskDAO_Impl
+com.cleanup.todoc.InterfaceDAO.SaveMyProjectDatabase <|-- com.cleanup.todoc.InterfaceDAO.SaveMyProjectDatabase_Impl
+com.cleanup.todoc.model.Task +.. com.cleanup.todoc.model.Task.TaskAZComparator
+com.cleanup.todoc.model.Comparator <|.. com.cleanup.todoc.model.Task.TaskAZComparator
+com.cleanup.todoc.model.Task +.. com.cleanup.todoc.model.Task.TaskZAComparator
+com.cleanup.todoc.model.Comparator <|.. com.cleanup.todoc.model.Task.TaskZAComparator
+com.cleanup.todoc.model.Task +.. com.cleanup.todoc.model.Task.TaskRecentComparator
+com.cleanup.todoc.model.Comparator <|.. com.cleanup.todoc.model.Task.TaskRecentComparator
+com.cleanup.todoc.model.Task +.. com.cleanup.todoc.model.Task.TaskOldComparator
+com.cleanup.todoc.model.Comparator <|.. com.cleanup.todoc.model.Task.TaskOldComparator
+com.cleanup.todoc.ui.DeleteTaskListener <|.. com.cleanup.todoc.ui.MainActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.cleanup.todoc.ui.MainActivity
+com.cleanup.todoc.InterfaceDAO.ProjectDAO <|.. com.cleanup.todoc.InterfaceDAO.ProjectDAO_Impl
+androidx.room.RoomDatabase <|-- com.cleanup.todoc.InterfaceDAO.SaveMyProjectDatabase
+@enduml
