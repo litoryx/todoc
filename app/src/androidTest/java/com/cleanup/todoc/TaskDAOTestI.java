@@ -44,7 +44,7 @@ public class TaskDAOTestI {
         Context context = ApplicationProvider.getApplicationContext();
         db = Room.inMemoryDatabaseBuilder(context, SaveMyProjectDatabase.class).build();
         taskDAO = db.mTaskDAO();
-        Task task = new Task(1,0,"sdvff",0);
+        Task task = new Task(1,1,"sdvff",0);
         db.mTaskDAO().insertTasks(task);
     }
 
@@ -59,7 +59,7 @@ public class TaskDAOTestI {
         db.mTaskDAO().insertTasks(task);
         List<Task> byTask = LiveDataTestUtil.getOrAwaitValue(taskDAO.getTasks());
         assertThat(byTask.get(0), equalTo(task));
-        assertThat(byTask.size(), equalTo(1));
+        assertThat(byTask.size(), equalTo(2));
     }
 
     @Test

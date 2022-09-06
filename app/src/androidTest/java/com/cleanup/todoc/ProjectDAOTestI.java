@@ -27,30 +27,31 @@ import static org.junit.Assert.assertThat;
 public class ProjectDAOTestI {
 
     private ProjectDAO mprojectDAO;
-    private SaveMyProjectDatabase db;
+    private SaveMyProjectDatabase db1;
+
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Before
     public void createDb() {
         Context context = ApplicationProvider.getApplicationContext();
-        db = Room.inMemoryDatabaseBuilder(context, SaveMyProjectDatabase.class).build();
-        mprojectDAO = db.mProjectDAO();
-        Project project = new Project(1,"sdvff",0);
-        db.mProjectDAO().createProject(project);
+        db1 = Room.inMemoryDatabaseBuilder(context, SaveMyProjectDatabase.class).build();
+        mprojectDAO = db1.mProjectDAO();
+        Project project = new Project(5L,"sdvff",0);
+        db1.mProjectDAO().createProject(project);
     }
 
     @After
     public void closeDb() throws IOException {
-        db.close();
+        db1.close();
     }
 
     @Test
-    public void writeProjectAndReadInList() throws Exception {
-        Project project = new Project(0,"vfd",0);
-        db.mProjectDAO().createProject(project);
+    public void writeProjectAndReadInList() throws InterruptedException {
+        Project project = new Project(0,"Projet",0xFFEADAD1);
+        db1.mProjectDAO().createProject(project);
         List<Project> byProject = LiveDataTestUtil.getOrAwaitValue(mprojectDAO.getProjects());
-        assertThat(byProject.get(3), equalTo(project));
-        assertThat(byProject.size(), equalTo(1));
+        assertThat(byProject.get(0), equalTo(project));
+        assertThat(byProject.size(), equalTo(2));
     }
 }
