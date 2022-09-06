@@ -15,4 +15,5 @@ public class ProjectDateRepertory {
 
     public LiveData<List<Project>> getProjects(){ return this.projectDAO.getProjects();}
 
+    public void createProject(Project project){projectDAO.createProject(project);}
 }
