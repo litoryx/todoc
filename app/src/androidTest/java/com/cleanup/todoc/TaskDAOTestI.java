@@ -44,7 +44,7 @@ public class TaskDAOTestI {
         Context context = ApplicationProvider.getApplicationContext();
         db = Room.inMemoryDatabaseBuilder(context, SaveMyProjectDatabase.class).build();
         taskDAO = db.mTaskDAO();
-        Project project = new Project(0,"dfsdf",0);
+        Project project = new Project(1,"dfsdf",0);
         db.mProjectDAO().createProject(project);
         Task task = new Task(1,1,"sdfgddf",0);
         db.mTaskDAO().insertTasks(task);
@@ -57,10 +57,10 @@ public class TaskDAOTestI {
 
     @Test
     public void writeTaskAndReadInList() throws Exception {
-        Task task = new Task(0,0,"Linge",2);
+        Task task = new Task(0,1,"sdfgddf",0);
         db.mTaskDAO().insertTasks(task);
         List<Task> byTask = LiveDataTestUtil.getOrAwaitValue(taskDAO.getTasks());
-        assertThat(byTask.get(0), equalTo(task));
+        assertThat(byTask.get(1), equalTo(task));
         assertThat(byTask.size(), equalTo(1));
     }
 
